@@ -5,15 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 3000 --open chrome",
-    "build": "tsc -b && vite build --base=./",
+    "build": "tsc -b && vite build",
     "test": "vitest",
-    "preview": "vite preview",
-    "predeploy" : "pnpm run build",
-    "deploy": "gh-pages -d dist"
-
+    "preview": "vite preview"
   },
   "dependencies": {
-    "gh-pages": "^6.3.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "uuid": "^11.1.0"
