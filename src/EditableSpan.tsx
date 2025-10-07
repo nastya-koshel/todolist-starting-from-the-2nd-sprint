@@ -28,7 +28,7 @@ export const EditableSpan = ({currentTitle, changeTitle, classes}: Props) => {
                      onBlur={offEditMode}
             />
             : <span
-                onDoubleClick={() => setIsEditMode(true)}
+                onDoubleClick={() => onEditMode()}
                 className={classes ? classes : ""}>{currentTitle}</span>
 
     )
