@@ -31,6 +31,7 @@ export const CreateItemForm = ({createItem}: PropsType) => {
             createItemHandler()
         }
     }
+
     return (
         <div>
             <input className={error ? 'error' : ''}
