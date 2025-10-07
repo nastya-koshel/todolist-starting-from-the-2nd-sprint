@@ -1,6 +1,7 @@
 import {Button} from "./Button.tsx";
-import {type ChangeEvent, type KeyboardEvent, useState} from 'react'
-import {FilterValuesType, TodolistType} from "./types.tsx";
+import {FilterValuesType, TaskType, TodolistType} from "./types.tsx";
+import {CreateItemForm} from "./CreateItemForm.tsx";
+import {EditableSpan} from "./EditableSpan.tsx";
 
 
 type TodolistPropsType = {
@@ -12,8 +13,10 @@ type TodolistPropsType = {
     changeFilter: (filter: FilterValuesType, todolistId: TodolistPropsType["id"]) => void
     createTask: (title: string, todolistId: TodolistPropsType["id"]) => void
     changeTaskStatus: (taskId: Task["id"], newTaskStatus: Task["isDone"], todolistId: TodolistPropsType["id"]) => void
-    deleteTodolist : (todolistId: TodolistType['id']) => void
+    deleteTodolist: (todolistId: TodolistType['id']) => void
     deleteAllTasks: (todolistId: TodolistPropsType["id"]) => void
+    changeTaskTitle: (taskId: TaskType["id"], newTaskTitle: TaskType["title"], todolistId: TodolistType['id']) => void
+    changeTodolistTitle: (newTodolistTitle: TodolistType['title'], todolistId: TodolistType['id']) => void
 }
 
 export type Task = {
@@ -34,45 +37,25 @@ export const Todolist = (
         createTask,
         changeTaskStatus,
         deleteTodolist,
-        deleteAllTasks
+        deleteAllTasks,
+        changeTaskTitle,
+        changeTodolistTitle
     }: TodolistPropsType) => {
-
-
-    const [taskTitle, setTaskTitle] = useState("");
-    const [error, setError] = useState<string | null>(null)
-
-    const createTaskHandler = () => {
-        const trimmedTitle = taskTitle.trim()
-        if (trimmedTitle !== '') {
-            createTask(taskTitle, id)
-        } else {
-            setError('Title is required')
-        }
-        setTaskTitle('')
-    }
-
-    const changeTaskTitleHandler = (event: ChangeEvent<HTMLInputElement>) => {
-        setTaskTitle(event.currentTarget.value)
-        setError(null)
-    }
-
-    const createTaskOnEnterHandler = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
-            createTaskHandler()
-        }
-    }
-
     const tasksList = tasks.length === 0
         ? <p>Tasks list is empty</p>
         : <ul>
             {
                 tasks.map(task => {
+                        const changeTaskTitleHandler = (newTitle: TaskType["title"]) => {
+                            changeTaskTitle(task.id, newTitle, id)
+                        }
+
                         return (
                             <li key={task.id} className={task.isDone ? 'task-done' : ''}>
                                 <input
                                     onChange={(e) => changeTaskStatus(task.id, e.currentTarget.checked, id)}
                                     type="checkbox" checked={task.isDone}/>
-                                <span>{task.title}</span>
+                                <EditableSpan currentTitle={task.title} changeTitle={changeTaskTitleHandler}/>
                                 <Button
                                     value="x"
                                     onClick={() => {
@@ -86,29 +69,22 @@ export const Todolist = (
             }
         </ul>
 
+    const createTaskHandler = (taskTitle: TaskType['title']) => {
+        createTask(taskTitle, id)
+    }
+
+    const changeTodolistTitleHandler = (newTitle: TodolistPropsType["title"]) => {
+        changeTodolistTitle(newTitle, id)
+    }
     return (
         <div>
             <div className="wrapper-title">
-                <h3>{title}</h3>
-                <Button value={"x"} onClick={() => deleteTodolist(id)} />
+                <h3>
+                    <EditableSpan currentTitle={title} changeTitle={changeTodolistTitleHandler} />
+                </h3>
+                <Button value={"x"} onClick={() => deleteTodolist(id)}/>
             </div>
-
-            <div>
-                <input className={error ? 'error' : ''}
-                    placeholder={"Enter task title"}
-                    value={taskTitle}
-                    onChange={changeTaskTitleHandler}
-                    onKeyDown={createTaskOnEnterHandler}
-                />
-                <Button
-                    value="+"
-                    disabled={taskTitle === "" || taskTitle.length > 15}
-                    onClick={createTaskHandler}
-                />
-                {error && <div className={'error-message'}>{error}</div>}
-                {taskTitle && taskTitle.length <= 15 && <div>max 15 characters</div>}
-                {taskTitle.length > 15 && <div className={"error-message"}>! title is too long !</div>}
-            </div>
+            <CreateItemForm createItem={createTaskHandler}/>
             <ul>
                 {tasksList}
             </ul>

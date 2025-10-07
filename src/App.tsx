@@ -4,6 +4,7 @@ import {v1} from 'uuid'
 import {Todolist} from './Todolist'
 import {FilterValuesType, TasksStateType, TaskType, TodolistType} from "./types.tsx";
 import {getFilteredTasks} from "./utilites.tsx";
+import {CreateItemForm} from "./CreateItemForm.tsx";
 
 
 
@@ -11,7 +12,6 @@ export const App = () => {
 
     const todolistId_1 = v1()
     const todolistId_2 = v1()
-
 
     const [todolists, setTodolists] = useState<TodolistType[]>([
         {id: todolistId_1, title: 'What to learn', filter: 'all'},
@@ -30,16 +30,9 @@ export const App = () => {
         ],
     })
 
-    //CRUD - Create Redact Update Delete
+    //TASKS (CRUD - Create Redact Update Delete)
 
-    const deleteTask = (taskId: string, todolistId: TodolistType['id']) => {
-        // 1 Создаем новый state иммутабельно
-        const newState = {...tasks, [todolistId]: tasks[todolistId].filter(t => t.id !== taskId)}
-        //(для себя) [todolistId] мы пишем в [] потому что это переменная в которой содержится индекс
-        //2 Сетаем newState
-        setTasks(newState)
-    }
-
+    //---Create---
     const createTask = (title: string, todolistId: TodolistType['id']) => {
         const newTask = {
             id: v1(),
@@ -57,6 +50,18 @@ export const App = () => {
         delete tasks[todolistId]
     }
 
+    //---Redact---
+    const changeTaskTitle = (taskId: TaskType["id"], newTaskTitle: TaskType["title"], todolistId: TodolistType['id']) => {
+        // 1 Создаем новый state иммутабельно
+        const newState= {
+            ...tasks,
+            [todolistId]: tasks[todolistId].map(t => t.id === taskId ? {...t, title: newTaskTitle} : t)
+        }
+        //2 Сетаем newState
+        setTasks(newState)
+    }
+
+    //---Update---
     const changeTaskStatus = (taskId: TaskType["id"], newTaskStatus: TaskType["isDone"], todolistId: TodolistType['id']) => {
         // 1 Создаем новый state иммутабельно
         const newState= {
@@ -67,11 +72,14 @@ export const App = () => {
         setTasks(newState)
     }
 
-    const changeFilter = (filter: FilterValuesType, todolistId: TodolistType['id']) => {
-        const newState = todolists.map (tl => tl.id === todolistId ? {...tl, filter: filter} : tl)
-        setTodolists(newState)
+    //---Delete---
+    const deleteTask = (taskId: string, todolistId: TodolistType['id']) => {
+        // 1 Создаем новый state иммутабельно
+        const newState = {...tasks, [todolistId]: tasks[todolistId].filter(t => t.id !== taskId)}
+        //(для себя) [todolistId] мы пишем в [] потому что это переменная в которой содержится индекс
+        //2 Сетаем newState
+        setTasks(newState)
     }
-
     const deleteAllTasks = (todolistId: TodolistType['id']) => {
         // 1 Создаем новый state иммутабельно
         const newState = {...tasks, [todolistId]: []}
@@ -79,6 +87,33 @@ export const App = () => {
         setTasks(newState)
     }
 
+    //TODOLISTS (CRUD)
+
+    //---Create---
+    const createTodolist = (title: TodolistType["title"]) => {
+        const todolistId = v1()
+        const newTodolist: TodolistType = {
+            id: todolistId,
+            title: title,
+            filter: 'all'
+        }
+        setTodolists([...todolists, newTodolist])
+        setTasks({...tasks, [todolistId]:[]})
+    }
+
+    //---Redact---
+    const changeTodolistTitle = (newTodolistTitle: TodolistType['title'], todolistId: TodolistType['id']) => {
+        const newState = todolists.map (tl => tl.id === todolistId ? {...tl, title: newTodolistTitle} : tl)
+        setTodolists(newState)
+    }
+
+    //---Update---
+    const changeFilter = (filter: FilterValuesType, todolistId: TodolistType['id']) => {
+        const newState = todolists.map (tl => tl.id === todolistId ? {...tl, filter: filter} : tl)
+        setTodolists(newState)
+    }
+
+    //---Delete---
     const deleteTodolist = (todolistId: TodolistType['id']) => {
         // 1 Создаем новый state иммутабельно
         const newState = todolists.filter(tl => tl.id !== todolistId)
@@ -100,12 +135,15 @@ export const App = () => {
                 changeFilter={changeFilter}
                 createTask={createTask}
                 deleteAllTasks={deleteAllTasks}
+                changeTaskTitle={changeTaskTitle}
+                changeTodolistTitle={changeTodolistTitle}
             />
         )
     })
 
     return (
         <div className="app">
+            <CreateItemForm createItem={createTodolist} />
             {todolistComponents}
         </div>
     )

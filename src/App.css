@@ -18,8 +18,8 @@
 }
 
 .btn-filter-active {
-    background-color: coral;
-    border: 2px solid coral;
+    background-color: #50b0ff;
+    border: 2px solid #50b0ff;
     border-radius: 5px;
     color: white;
 }
