@@ -1,8 +1,10 @@
-import {Button} from "./Button.tsx";
+// import {Button} from "./Button.tsx";
 import {type ChangeEvent, type KeyboardEvent, useState} from "react";
+import {IconButton, TextField} from "@mui/material";
+import AddIcon from '@mui/icons-material/Add';
 
 type PropsType = {
-    createItem: (title: string ) => void,
+    createItem: (title: string) => void,
 }
 
 export const CreateItemForm = ({createItem}: PropsType) => {
@@ -34,18 +36,19 @@ export const CreateItemForm = ({createItem}: PropsType) => {
 
     return (
         <div>
-            <input className={error ? 'error' : ''}
-                   placeholder={"Enter task title"}
-                   value={itemTitle}
-                   onChange={changeItemTitleHandler}
-                   onKeyDown={createItemOnEnterHandler}
+            <TextField className={error ? 'error' : ''}
+                       size="small"
+                       placeholder={"Enter task title"}
+                       value={itemTitle}
+                       onChange={changeItemTitleHandler}
+                       onKeyDown={createItemOnEnterHandler}
+                       error={error}
+                       helperText={error && "Title is required"}
             />
-            <Button
-                value="+"
+            <IconButton
+                size="small"
                 disabled={itemTitle === "" || itemTitle.length > maxTitleLength}
-                onClick={createItemHandler}
-            />
-            {error && <div className={'error-message'}>{error}</div>}
+                onClick={createItemHandler}><AddIcon/></IconButton>
             {itemTitle && itemTitle.length <= maxTitleLength && <div>max {maxTitleLength} characters</div>}
             {itemTitle.length > maxTitleLength && <div className={"error-message"}>! title is too long !</div>}
         </div>

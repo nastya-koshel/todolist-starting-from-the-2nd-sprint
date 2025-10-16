@@ -1,20 +1,7 @@
 .app {
-    padding: 30px;
     display: flex;
-
-}
-
-.app > div {
-    margin-right: 50px;
-}
-
-.task {
-    font-weight: bold;
-}
-
-.task-done {
-    opacity: 0.5;
-    text-decoration: line-through;
+    flex-direction: column;
+    width: 100vw;
 }
 
 .btn-filter-active {
@@ -36,4 +23,8 @@
     display: flex;
     align-items: center;
     gap: 15px;
+}
+
+ul {
+    padding-left: 0;
 }

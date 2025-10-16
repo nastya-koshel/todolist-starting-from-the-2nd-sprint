@@ -1,7 +1,10 @@
-import {Button} from "./Button.tsx";
 import {FilterValuesType, TaskType, TodolistType} from "./types.tsx";
 import {CreateItemForm} from "./CreateItemForm.tsx";
 import {EditableSpan} from "./EditableSpan.tsx";
+import {Box, Button, Checkbox, IconButton, List, ListItem, Typography} from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
+import BackspaceIcon from '@mui/icons-material/Backspace';
+import {containerWithGapSx2, getListItemSx} from "./Todolist.style.tsx";
 
 
 type TodolistPropsType = {
@@ -43,31 +46,36 @@ export const Todolist = (
     }: TodolistPropsType) => {
     const tasksList = tasks.length === 0
         ? <p>Tasks list is empty</p>
-        : <ul>
+        : <List>
             {
                 tasks.map(task => {
                         const changeTaskTitleHandler = (newTitle: TaskType["title"]) => {
                             changeTaskTitle(task.id, newTitle, id)
                         }
-
                         return (
-                            <li key={task.id} className={task.isDone ? 'task-done' : ''}>
-                                <input
-                                    onChange={(e) => changeTaskStatus(task.id, e.currentTarget.checked, id)}
-                                    type="checkbox" checked={task.isDone}/>
-                                <EditableSpan currentTitle={task.title} changeTitle={changeTaskTitleHandler}/>
-                                <Button
-                                    value="x"
-                                    onClick={() => {
-                                        deleteTask(task.id, id)
-                                    }}
-                                />
-                            </li>
+                            <ListItem key={task.id}
+                                      className={task.isDone ? 'task-done' : ''}
+                                      disablePadding
+                                      sx={{justifyContent: "space-between"}}
+                            >
+                                <Box sx={{display: "flex", alignItems: "center"}}>
+                                    <Checkbox
+                                        size="small"
+                                        onChange={(e) => changeTaskStatus(task.id, e.currentTarget.checked, id)}
+                                        checked={task.isDone}/>
+                                    <Box sx={getListItemSx(task.isDone)}>
+                                        <EditableSpan currentTitle={task.title} changeTitle={changeTaskTitleHandler} />
+                                    </Box>
+                                </Box>
+                                <IconButton size="small" onClick={() => {
+                                    deleteTask(task.id, id)
+                                }}><BackspaceIcon/></IconButton>
+                            </ListItem>
                         )
                     }
                 )
             }
-        </ul>
+        </List>
 
     const createTaskHandler = (taskTitle: TaskType['title']) => {
         createTask(taskTitle, id)
@@ -78,25 +86,40 @@ export const Todolist = (
     }
     return (
         <div>
-            <div className="wrapper-title">
-                <h3>
-                    <EditableSpan currentTitle={title} changeTitle={changeTodolistTitleHandler} />
-                </h3>
-                <Button value={"x"} onClick={() => deleteTodolist(id)}/>
-            </div>
+            <Box className="wrapper-title" sx={{justifyContent: "space-between", padding: "15px 0"}}>
+                <Typography variant="h5">
+                    <EditableSpan currentTitle={title} changeTitle={changeTodolistTitleHandler}/>
+                </Typography>
+                <IconButton onClick={() => deleteTodolist(id)}><DeleteIcon/></IconButton>
+            </Box>
             <CreateItemForm createItem={createTaskHandler}/>
             <ul>
                 {tasksList}
             </ul>
-            <div>
-                <Button value="All" onClick={() => changeFilter("all", id)}
-                        className={filter === "all" ? "btn-filter-active" : " "}/>
-                <Button value="Active" onClick={() => changeFilter("active", id)}
-                        className={filter === "active" ? "btn-filter-active" : " "}/>
-                <Button value="Completed" onClick={() => changeFilter("completed", id)}
-                        className={filter === "completed" ? "btn-filter-active" : " "}/>
-                <Button value="Delete all tasks" onClick={() => deleteAllTasks(id)}/>
-            </div>
+            <Box sx={containerWithGapSx2}>
+                <Button
+                    variant="contained"
+                    onClick={() => changeFilter("all", id)}
+                    color={filter === "all" ? "secondary" : "primary"}
+                    size="small"
+                    disableElevation
+                >All</Button>
+                <Button
+                    variant="contained"
+                    onClick={() => changeFilter("active", id)}
+                    color={filter === "active" ? "secondary" : "primary"}
+                    size="small"
+                    disableElevation
+                >Active</Button>
+                <Button
+                    variant="contained"
+                    onClick={() => changeFilter("completed", id)}
+                    color={filter === "completed" ? "secondary" : "primary"}
+                    size="small"
+                    disableElevation
+                >Completed</Button>
+                <IconButton onClick={() => deleteAllTasks(id)}><DeleteIcon/></IconButton>
+            </Box>
         </div>
     )
 }
